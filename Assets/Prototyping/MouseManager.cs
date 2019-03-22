@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class MouseManager : MonoBehaviour
 {
@@ -13,10 +14,13 @@ public class MouseManager : MonoBehaviour
     public Texture2D doorway; // Cursor for foorways
     public Texture2D combat; // Cursor for combat actions
 
+    public EventVector3 OnClickEnviroment; // creamos un evento del tipo de la clase que hereda de UnityEvent
+
     void Update()
     {
         RaycastHit hit;
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 50, clickableLayer.value))
+        float maxDistance = 50;
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, maxDistance, clickableLayer.value))
         {
             bool door = false;
             if (hit.collider.gameObject.tag == "Doorway")
@@ -28,10 +32,19 @@ public class MouseManager : MonoBehaviour
             {
                 Cursor.SetCursor(target, new Vector2(16, 16), CursorMode.Auto);
             }
+
+            if (Input.GetMouseButtonDown(0)) // left button mouse
+            {
+                OnClickEnviroment.Invoke(hit.point); // Invocamos el evento
+            }
         }
-        else
+        else // raycast not found
         {
             Cursor.SetCursor(pointer, Vector2.zero, CursorMode.Auto);
         }
     }
 }
+
+[System.Serializable] // Permite al editor interpretar la clase como un atributo interno.
+public class EventVector3 : UnityEvent<Vector3> { }; // Creamos una clase que hereda de UnityEvent 
+                                                     //Pasandole por template el parametro que necesitamos
