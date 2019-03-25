@@ -23,10 +23,17 @@ public class MouseManager : MonoBehaviour
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, maxDistance, clickableLayer.value))
         {
             bool door = false;
+            bool item = false;
+
             if (hit.collider.gameObject.tag == "Doorway")
             {
                 Cursor.SetCursor(doorway, new Vector2(16, 16), CursorMode.Auto);
                 door = true;
+            }
+            else if (hit.collider.gameObject.tag == "Item")
+            {
+                Cursor.SetCursor(combat, new Vector2(16, 16), CursorMode.Auto);
+                item = true;
             }
             else
             {
@@ -35,7 +42,22 @@ public class MouseManager : MonoBehaviour
 
             if (Input.GetMouseButtonDown(0)) // left button mouse
             {
-                OnClickEnviroment.Invoke(hit.point); // Invocamos el evento
+                if (door)
+                {
+                    Transform doorway = hit.collider.gameObject.transform;
+                    OnClickEnviroment.Invoke(doorway.position);
+                    Debug.Log("door");
+                }
+                else if (item)
+                {
+                    Transform itemPos = hit.collider.gameObject.transform;
+                    OnClickEnviroment.Invoke(itemPos.position);
+                    Debug.Log("item");
+                }
+                else
+                {
+                    OnClickEnviroment.Invoke(hit.point); // Invocamos el evento
+                }
             }
         }
         else // raycast not found
